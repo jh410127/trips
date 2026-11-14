@@ -717,6 +717,18 @@ svg.leaflet-image-layer.leaflet-interactive path {
 /* ITINERARY HOURS AND SECONDARY POIS */
 .timeline .itinerary-hours{font-size:12px;line-height:1.7;font-weight:400;color:#68615B;background:transparent;border:0;padding:0;margin:8px 0 0}
 #busan-regions .fm-real-symbol.is-secondary{width:23px;height:23px;padding:4px;border-width:1.5px;box-shadow:0 1px 2px #0002}
+/* PAPER MAP AND SECONDARY COLOR */
+#busan-regions .fm-real-symbol.is-secondary{background:#A8D3E6;color:#34586A;border-color:#587A88}
+#busan-regions .fm-real-symbol.is-primary{background:#F2A497;border-color:#3E3A39}
+#busan-regions .fm-real-symbol.is-primary.is-hotel{background:#F6D27A}
+#busan-regions .fm-real-symbol{border-radius:46% 54% 48% 52% / 54% 47% 53% 46%}
+#busan-regions .fm-main-key{color:#A85246}#busan-regions .fm-alt-key{color:#587A88}
+#busan-regions #fm-geographic{background:#F4F0DF}
+#busan-regions #fm-geographic .leaflet-tile-pane{filter:sepia(.24) saturate(.58) contrast(.92)}
+#busan-regions #fm-geographic:after{content:'';position:absolute;inset:0;z-index:350;pointer-events:none;opacity:.12;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='.45'/%3E%3C/svg%3E")}
+#busan-regions .fm-mapcard{border-radius:25px 23px 26px 22px;box-shadow:3px 4px 0 #3E3A3918}
+#busan-regions .leaflet-control-zoom{border:2px solid #3E3A39;border-radius:12px;overflow:hidden;box-shadow:2px 2px 0 #3E3A3922}
+#busan-regions .leaflet-control-zoom a{background:#FFFCF6;color:#3E3A39}
 </style></head><body>
 <header><nav aria-label="主要選單"><a class="brand" href="#home">✿ 釜山散步日記</a><div class="links"><a href="#flights">航班</a><a href="#days">行程</a><a href="#food-map">美食地圖</a><a href="#stay">住宿</a><a href="#todo">確認／採購</a></div></nav></header>
 <main><section class="hero" id="home"><div><span class="pill">BUSAN · 5 DAYS (12/12 ~ 12/17)</span><p class="eyebrow">把海風，收進旅行繪本裡</p><h1>一起去釜山<br>慢慢走吧！</h1><p>海雲台的浪、廣安里的散步時光，<br>還有滿滿五天的小小冒險。</p><div class="card countdown"><span class="small">我們的出發倒數</span><strong id="count" aria-live="polite">出發日期待補</strong><label class="date-control">出發日期 <input id="departure" type="date" aria-label="設定出發日期"></label><p class="small muted">預設出發日為 2026/12/12，可調整日期以更新倒數與每日行程。</p></div></div>
@@ -727,7 +739,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 <div id="busan-regions">
 <div class="fm-heading"><div><span class="number">03 / FOOD MAP · 隨心選一家</span><h2 id="food-title">釜山，照著地圖散步</h2></div></div>
 <div class="fm-areas" aria-label="美食景點地圖區域"><button type="button" data-area="海雲台" aria-pressed="true">海雲台</button><button type="button" data-area="廣安里" aria-pressed="false">廣安里</button><button type="button" data-area="南浦洞" aria-pressed="false">南浦洞</button><button type="button" data-area="影島" aria-pressed="false">影島</button><button type="button" data-area="西面・田浦" aria-pressed="false">西面・田浦</button><button type="button" data-area="荒嶺山・南區" aria-pressed="false">荒嶺山・南區</button><button type="button" data-area="機張・東釜山" aria-pressed="false">機張・東釜山</button><button type="button" data-area="松島・西區" aria-pressed="false">松島・西區</button><button type="button" data-area="沙下區・新坪／甘川" aria-pressed="false">沙下區・新坪／甘川</button><button type="button" data-area="江西區・金海機場" aria-pressed="false">江西區・金海機場</button><button type="button" data-area="釜山站・草梁" aria-pressed="false">釜山站・草梁</button></div>
-<div class="fm-route-tools"><label for="fm-route-day">查看行程虛線</label><select id="fm-route-day"><option value="all" selected>全部 6 天</option><option value="0">DAY 1</option><option value="1">DAY 2</option><option value="2">DAY 3</option><option value="3">DAY 4</option><option value="4">DAY 5</option><option value="5">DAY 6</option><option value="none">不顯示路線</option></select><button id="fm-show-all" type="button">全釜山</button></div><div class="fm-layout"><div class="fm-mapcard"><div class="fm-toolbar"><strong id="fm-area-title">釜山地理地圖</strong><span class="fm-small">北上南下 · 可拖曳／縮放</span></div><div id="fm-geographic" role="region" aria-label="釜山真實地理位置與每日行程地圖"></div><div class="fm-legend"><span>⌂ 住宿</span><span>🍴 餐廳</span><span>☕ 咖啡</span><span>🛒 市場</span><span>✧ 景點</span><span>✈ 機場</span></div><p class="fm-small fm-mapnote">全部已定位 POI 保留顯示；區域按鈕只移動視野。虛線按每日行程順序直線連接，箭頭表示前進方向；並非沿道路導航，不代表實際行車距離或時間。海岸列車以尾浦站為代表，松島纜車以松島灣站為代表；未畫乘坐區間。底圖需網路連線。</p></div><aside id="fm-detail" class="fm-detail" aria-live="polite"></aside></div><div id="fm-route-summary" aria-live="polite"></div>
+<div class="fm-route-tools"><label for="fm-route-day">查看行程虛線</label><select id="fm-route-day"><option value="all" selected>全部 6 天</option><option value="0">DAY 1</option><option value="1">DAY 2</option><option value="2">DAY 3</option><option value="3">DAY 4</option><option value="4">DAY 5</option><option value="5">DAY 6</option><option value="none">不顯示路線</option></select><button id="fm-show-all" type="button">全釜山</button></div><div class="fm-layout"><div class="fm-mapcard"><div class="fm-toolbar"><strong id="fm-area-title">釜山地理地圖</strong><span class="fm-small">北上南下 · 可拖曳／縮放</span></div><div id="fm-geographic" role="region" aria-label="釜山真實地理位置與每日行程地圖"></div><div class="fm-legend"><span>⌂ 住宿</span><span>🍴 餐廳</span><span>☕ 咖啡</span><span>🛒 市場</span><span>✧ 景點</span><span>✈ 機場</span><span class="fm-main-key">● 主行程</span><span class="fm-alt-key">● 備選</span></div><p class="fm-small fm-mapnote">區域按鈕只顯示該區 POI；「全釜山」顯示所有地點。選擇每日路線時會顯示跨區行程。虛線按每日行程順序直線連接，箭頭表示前進方向；並非沿道路導航，不代表實際行車距離或時間。海岸列車以尾浦站為代表，松島纜車以松島灣站為代表；未畫乘坐區間。底圖需網路連線。</p></div><aside id="fm-detail" class="fm-detail" aria-live="polite"></aside></div><div id="fm-route-summary" aria-live="polite"></div>
 <div id="fm-pending" class="fm-small"></div>
 <div class="fm-list-heading"><h3>口袋餐廳與景點小抄</h3><span class="fm-small">依地區分組 · 點店名看 POI</span></div>
 <p class="fm-small fm-explanation">營業時間為韓國當地時間。★ 僅填入實際查到的 NAVER 星等；「未取得」不代表零分。可預約不等於必須預約，未明示的規則標為待確認。</p>
@@ -783,7 +795,9 @@ const visible=()=>places.filter(p=>p.area===area);
 const naver=p=>p.naver||'https://map.naver.com/p/search/'+encodeURIComponent(p.query);
 const rating=p=>p.rating!==null?'★ '+p.rating.toFixed(2):p.ratingStatus;
 // Geographic map: all located POIs remain on the map; region buttons only move the viewport.
-let geoMap,geoMarkers,geoLines,geoSteps,routeDay='none';
+let geoMap,geoMarkers,geoLines,geoSteps,routeDay='none',mapScope='all';
+const geoMarkerRecords=[];
+function syncGeoMarkers(){geoMarkers.clearLayers();geoMarkerRecords.filter(r=>mapScope==='all'||r.p.area===area).forEach(r=>r.marker.addTo(geoMarkers));}
 const routeColors=Array(6).fill('#51825B');
 const geoPlaces=()=>places.filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
 const coord=p=>[p.lat,p.lng];
@@ -797,11 +811,12 @@ function initGeo(){
  geoPlaces().forEach(p=>{
   const primary=primaryIds.has(p.id),size=primary?34:23;
   const marker=L.marker(coord(p),{icon:L.divIcon({className:'fm-real-marker',html:`<button type="button" class="fm-real-symbol ${p.type==='hotel'?'is-hotel':''} ${primary?'is-primary':'is-secondary'}" aria-label="${esc(p.name)}">${icon(p.type)}</button>`,iconSize:[size,size],iconAnchor:[size/2,size/2]}),title:p.name,zIndexOffset:primary?500:0,keyboard:true}).addTo(geoMarkers);
+  geoMarkerRecords.push({p,marker});
   marker.bindTooltip(esc(p.name),{direction:'top',offset:[0,-16],className:'fm-geo-tooltip'});
   marker.on('click',()=>{selected=p.id;area=p.area;detail();$('#fm-detail').scrollIntoView({behavior:'auto',block:'nearest'});});
  });
- document.getElementById('fm-route-day').addEventListener('change',e=>{routeDay=e.target.value;drawRoutes(true);});
- document.getElementById('fm-show-all').addEventListener('click',()=>{fitPoints(geoPlaces().map(coord));$('#fm-area-title').textContent='全釜山 · '+geoPlaces().length+' 個已定位 POI';});
+ document.getElementById('fm-route-day').addEventListener('change',e=>{routeDay=e.target.value;mapScope='all';syncGeoMarkers();drawRoutes(true);});
+ document.getElementById('fm-show-all').addEventListener('click',()=>{mapScope='all';syncGeoMarkers();$$('[data-area]').forEach(b=>b.setAttribute('aria-pressed','false'));fitPoints(geoPlaces().map(coord));$('#fm-area-title').textContent='全釜山 · '+geoPlaces().length+' 個已定位 POI';});
  geoMap.on('zoomend',()=>{document.getElementById('fm-geographic').classList.toggle('fm-close-zoom',geoMap.getZoom()>=15);});
 }
 function routeForDay(i){
@@ -841,7 +856,7 @@ function drawRoutes(fit=false){
  document.getElementById('fm-route-summary').innerHTML=indexes.length?indexes.map(i=>{const route=routeForDay(i);const distance=route.slice(1).reduce((n,s,j)=>n+km(route[j].p,s.p),0);return `<details class="fm-route-card" ${indexes.length===1?'open':''}><summary style="--route-color:${routeColors[i]}">DAY ${i+1} · ${esc(days[i].title)} <small>直線合計 ${distance.toFixed(1)} km</small></summary><p>${warnings[i]}</p><ol>${route.map(s=>`<li><button type="button" data-place="${s.id}">${esc(s.label)}</button>${s.time?` <small>${esc(s.time)}</small>`:''}</li>`).join('')}</ol></details>`;}).join(''):'<p>選擇一天即可查看依行程順序連接的虛線、方向與折返提醒。</p>';
 }
 function landscape(){initGeo();geoMap.invalidateSize();}
-function render(){const list=visible();if(!list.some(p=>p.id===selected))selected=list[0]?.id||null;landscape();
+function render(){const list=visible();if(!list.some(p=>p.id===selected))selected=list[0]?.id||null;landscape();syncGeoMarkers();
  $('#fm-area-title').textContent=area+' · '+list.filter(p=>p.lat).length+' 個已定位 POI';
  $$('[data-area]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.area===area)));
  const points=list.filter(p=>p.lat).map(coord);fitPoints(points);drawRoutes(false);detail();
@@ -859,9 +874,9 @@ $('#fm-restaurant-lists').innerHTML=areas.filter(a=>places.some(p=>p.area===a&&p
 $('#fm-sources').innerHTML='<ul>'+places.filter(p=>p.naver||p.hoursSource||p.source).map(p=>`<li>${esc(p.name)}：${p.naver?`<a href="${esc(p.naver)}" target="_blank" rel="noopener noreferrer">NAVER店家頁</a>（${p.rating!==null?'星等已核對':p.ratingStatus}）`:''}${p.hoursSource?` <a href="${esc(p.hoursSource)}" target="_blank" rel="noopener noreferrer">營業時間來源</a>`:''}${p.source?` <a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">地址來源</a>`:''}</li>`).join('')+'</ul>';
 }
 function expandArea(){ $$('[data-list-area]').forEach(el=>el.open=el.dataset.listArea===area); }
-function setArea(value){if(!areas.includes(value))return;area=value;kind='all';expandArea();render();}
+function setArea(value){if(!areas.includes(value))return;area=value;mapScope='area';routeDay='none';document.getElementById('fm-route-day').value='none';kind='all';expandArea();render();}
 function selectPlace(id,scroll=true){const p=places.find(p=>p.id===id);if(!p)return;if(!areas.includes(p.area)){selected=id;detail();if(scroll)document.getElementById('food-map').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});return;}area=p.area;kind='all';selected=id;expandArea();render();if(scroll){document.getElementById('food-map').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});$('#fm-detail').setAttribute('tabindex','-1');$('#fm-detail').focus({preventScroll:true});}}
-function browseMeal(value,targetArea='海雲台'){if(areas.includes(targetArea))area=targetArea;kind='food';render();document.getElementById('food-map').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
+function browseMeal(value,targetArea='海雲台'){if(areas.includes(targetArea))area=targetArea;mapScope='area';routeDay='none';document.getElementById('fm-route-day').value='none';kind='food';render();document.getElementById('food-map').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
 root.addEventListener('click',event=>{const b=event.target.closest('button');if(!b)return;if(b.dataset.area){setArea(b.dataset.area);return;}if(b.dataset.kind){kind=b.dataset.kind;render();return;}if(b.dataset.view){view=b.dataset.view;$$('[data-view]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.view===view)));$('#fm-scene').hidden=view!=='drawing';$('#fm-street').hidden=view!=='street';detail();return;}if(b.dataset.place){const p=places.find(p=>p.id===b.dataset.place);if(!p)return;selected=p.id;if(p.area!==area){area=p.area;kind='all';}render();if(b.dataset.scroll){document.getElementById('food-map').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}}});
 restaurantLists();routeDay='all';render();drawRoutes(true);
 window.BusanFoodMap=Object.freeze({setArea,selectPlace,browseMeal,getArea:()=>area});
@@ -870,4 +885,6 @@ window.BusanFoodMap=Object.freeze({setArea,selectPlace,browseMeal,getArea:()=>ar
 
 
 </script></body></html>
+
+
 
