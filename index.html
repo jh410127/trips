@@ -195,24 +195,35 @@ const stationNodes={土城:[90,570],札嘎其:[180,570],南浦:[270,570],釜山:
 const anchorOf=p=>{
  const t=window.BusanTransit?.[p.id];if(t&&stationNodes[t.station])return {name:t.station,xy:stationNodes[t.station],note:t.exit+'號出口'+(/公車/.test(t.note)?' → 公車':'')};
  const related={hotel:'海雲台',light:'海雲台',market:'海雲台',luge:'OSIRIA',airport:'機場',songdocable:'札嘎其',songdobridge:'札嘎其',arte:'南浦','nampo-hotel':'土城'};
+ if(isFood(p)&&!related[p.id]){const areaStation={'海雲台':'海雲台','廣安里':'廣安','南浦洞':'南浦','影島':'南浦','西面・田浦':'西面','釜山站・草梁':'釜山','沙下區・新坪／甘川':'土城'};const ref=areaStation[p.area];if(ref)return {name:ref,xy:stationNodes[ref],note:'區域參考站；最近出口請導航確認',reference:true};}
  const name=related[p.id];return name?{name,xy:stationNodes[name],note:['songdocable','songdobridge','arte'].includes(p.id)?'出站後接駁':p.id==='luge'?'出站後接駁':p.id==='airport'?'機場輕軌站':'同區方向；出口另查'}:null;
 };
 function diagramText(x,y,lines,size=12,fill='#3E3A39'){return `<text x="${x}" y="${y}" text-anchor="middle" fill="${fill}" font-family="Huninn,sans-serif" font-size="${size}" paint-order="stroke" stroke="#FFFCF6" stroke-width="3">${lines.map((t,i)=>`<tspan x="${x}" dy="${i?size+3:0}">${esc(t)}</tspan>`).join('')}</text>`;}
 function renderOverview(){
  const stops=routeForDay(overviewDay),ids=[...new Set(stops.map(s=>s.id))];
- const list=overviewArea==='today'?ids.map(id=>places.find(p=>p.id===id)):places.filter(p=>p.area===overviewArea);
+ const primary=ids.map(id=>places.find(p=>p.id===id)).filter(Boolean);
+ const dayAreas=new Set(primary.map(p=>p.area));
+ const candidates=places.filter(p=>isFood(p)&&dayAreas.has(p.area)&&!ids.includes(p.id));
+ const list=overviewArea==='today'?[...primary,...candidates]:places.filter(p=>p.area===overviewArea);
  const occupied=Object.entries(stationNodes).map(([name,[x,y]])=>({left:x-63,right:x+63,top:y-34,bottom:y+34}));
  const intersects=(a,b)=>a.left<b.right+8&&a.right>b.left-8&&a.top<b.bottom+7&&a.bottom>b.top-7;
  const box=(x,y)=>({left:x-84,right:x+84,top:y-28,bottom:y+94});
  const preferred={airport:[145,61],hotel:[690,76],haeundae:[655,130],market:[730,223],light:[790,284],gwangalli:[525,405],luge:[725,30],lotteworld:[852,38],beachtrain:[850,228],xsky:[750,317],spaland:[585,170],huinnyeoul:[370,650],songdocable:[160,665],songdobridge:[66,690],arte:[510,650],gwangbok:[350,540],busantower:[420,490],gamcheon:[55,480],jagalchi:[180,490],'nampo-hotel':[85,635]};
- const dots=list.filter(Boolean).map((p,i)=>{const a=anchorOf(p);let [x,y]=overviewArea==='today'?(preferred[p.id]||[450,650]):[95+(i%5)*177,670+Math.floor(i/5)*120];
+ const dots=list.filter(Boolean).map((p,i)=>{const a=anchorOf(p),backup=overviewArea==='today'&&!ids.includes(p.id);let [x,y]=overviewArea==='today'?(preferred[p.id]||[450,650]):[95+(i%5)*177,670+Math.floor(i/5)*120];
+  if(backup){
+   const origin=a?.xy||[450,650],smallBox=(cx,cy)=>({left:cx-17,right:cx+17,top:cy-17,bottom:cy+17});
+   const spots=[];for(let ring=0;ring<7;ring++)for(const dx of [-72,-36,0,36,72])spots.push([origin[0]+dx,origin[1]+65+ring*38]);
+   for(let gy=80;gy<1100;gy+=38)for(let gx=45;gx<855;gx+=38)spots.push([gx,gy]);
+   const free=spots.find(([cx,cy])=>cx>=35&&cx<=865&&cy>=35&&!occupied.some(q=>intersects(smallBox(cx,cy),q)));
+   if(free)[x,y]=free;occupied.push(smallBox(x,y));return {p,a,x,y,backup};
+  }
   if(overviewArea==='today'){
    const candidates=[[x,y],[x+105,y],[x-105,y],[x,y+125],[x,y-125]];
    for(let gy=85;gy<=1200;gy+=135)for(let gx=105;gx<=820;gx+=180)candidates.push([gx,gy]);
    const free=candidates.find(([cx,cy])=>cx>=90&&cx<=810&&cy>=40&&!occupied.some(q=>intersects(box(cx,cy),q)));
    if(free)[x,y]=free;
   }
-  occupied.push(box(x,y));return {p,a,x,y};});
+  occupied.push(box(x,y));return {p,a,x,y,backup};});
  const h=Math.max(800,...dots.map(d=>d.y+125));
  const active=new Set(dots.map(d=>d.a?.name).filter(Boolean));
  const label=(s)=>s==='Centum City'?'Centum City':s;
@@ -221,17 +232,17 @@ function renderOverview(){
  $('#overview-svg').innerHTML=`<svg viewBox="0 0 900 ${h}" role="img" aria-label="每日景點與捷運路線總覽"><rect x="4" y="4" width="892" height="${h-8}" rx="24" fill="#FAF3E5" stroke="#3E3A39" stroke-width="2.5"/><path d="M360 605q150-70 290 0t245 0V${h-5}H360Z" fill="#DCECF0"/><path d="M625 550q15 10 30 0m75 45q15 10 30 0m-155 90q15 10 30 0" fill="none" stroke="#A8D3E6" stroke-width="3"/>
  ${lines.map(([name,color,path,x,y])=>`<path d="${path}" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>${diagramText(x,y,[name],12,color)}`).join('')}
  
- ${dots.map(({p,a,x,y})=>a?`<path d="M${a.xy[0]} ${a.xy[1]}L${x} ${y}" stroke="#79857A" stroke-width="1.4" stroke-dasharray="4 5" fill="none"/>`:'').join('')}
+ ${dots.map(({p,a,x,y,backup})=>a?`<path d="M${a.xy[0]} ${a.xy[1]}L${x} ${y}" stroke="#79857A" stroke-width="${backup?.8:1.4}" stroke-dasharray="4 5" opacity="${backup?.38:1}" fill="none"/>`:'').join('')}
  ${Object.entries(stationNodes).map(([name,[x,y]])=>`<circle cx="${x}" cy="${y}" r="${name==='西面'?10:7}" fill="#FFFCF6" stroke="${active.has(name)?'#3E3A39':'#9B9B87'}" stroke-width="${active.has(name)?3:2}"/>${diagramText(x,name==='海雲台'||name==='中洞'?y+25:y-14,[label(name)+'站'],15)}`).join('')}
- ${dots.map(({p,a,x,y})=>{const main=mainIds.has(p.id),r=main?24:15;return `<g role="button" tabindex="0" data-place="${p.id}" class="overview-poi" aria-label="${esc(p.name)}"><title>${esc(p.name)}</title><circle cx="${x}" cy="${y}" r="${r}" fill="${main?'#F2A497':'#A8D3E6'}" stroke="#3E3A39" stroke-width="2"/><g transform="translate(${x-r*.65} ${y-r*.65}) scale(${r*1.3/24})" fill="none" stroke="#3E3A39" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[p.type]||icons.sight}</g></g>`;}).join('')}
- ${dots.map(({p,a,x,y})=>{const r=mainIds.has(p.id)?24:15;return diagramText(x,y+r+15,short(p.name),12)+(a?diagramText(x,y+r+20+short(p.name).length*15,short(a.name+' · '+a.note,14),10,'#426748'):'');}).join('')}
+ ${dots.map(({p,a,x,y,backup})=>{const main=mainIds.has(p.id),r=main?24:backup?11:15;return `<g role="button" tabindex="0" data-place="${p.id}" class="overview-poi ${backup?'dining-backup':''}" data-backup="${backup?'true':'false'}" aria-label="${esc(p.name)}"><title>${esc(p.name)}</title><circle cx="${x}" cy="${y}" r="${r}" fill="${main?'#F2A497':'#A8D3E6'}" stroke="#3E3A39" stroke-width="2"/><g transform="translate(${x-r*.65} ${y-r*.65}) scale(${r*1.3/24})" fill="none" stroke="#3E3A39" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[p.type]||icons.sight}</g></g>`;}).join('')}
+ ${dots.map(({p,a,x,y,backup})=>{if(backup)return '';const r=mainIds.has(p.id)?24:15;return diagramText(x,y+r+15,short(p.name),12)+(a?diagramText(x,y+r+20+short(p.name).length*15,short(a.name+' · '+a.note,14),10,'#426748'):'');}).join('')}
  ${diagramText(450,h-18,['路線總覽示意・中間站省略・虛線為景點與站點關聯，非實際步行路線'],10,'#68615B')}</svg>`;
  $('#overview-date').textContent='DAY '+(overviewDay+1)+' · '+labelDate(overviewDay);
 }
 const labelDate=i=>label(i);
 function detail(){const p=places.find(p=>p.id===selected);if(!p)return;
- const t=window.BusanTransit?.[p.id];$('#fm-detail').hidden=false;
- $('#fm-detail').innerHTML=`<button type="button" class="overview-close" data-close="true" aria-label="關閉地點資訊">×</button><span class="fm-badge">${esc(p.area)} · ${mainIds.has(p.id)?'主行程':'備選'}</span><h3>${esc(p.name)}</h3>${t?`<p class="cm-transit">${esc(transitText(p.id))}</p>`:''}<dl><dt>地址</dt><dd>${esc(p.address)}</dd><dt>營業</dt><dd>${esc(p.hours)}</dd>${isFood(p)?`<dt>NAVER</dt><dd>${esc(rating(p))}</dd><dt>預約</dt><dd>${esc(p.booking)}</dd>`:''}</dl>${p.note?`<p class="fm-small">${esc(p.note)}</p>`:''}<div class="fm-links"><a href="${esc(naver(p))}" target="_blank" rel="noopener noreferrer">NAVER 導航 ↗</a></div>`;
+ const t=window.BusanTransit?.[p.id],ref=anchorOf(p);$('#fm-detail').hidden=false;
+ $('#fm-detail').innerHTML=`<button type="button" class="overview-close" data-close="true" aria-label="關閉地點資訊">×</button><span class="fm-badge">${esc(p.area)} · ${mainIds.has(p.id)?'主行程':'備選'}</span><h3>${esc(p.name)}</h3>${t?`<p class="cm-transit">${esc(transitText(p.id))}</p>`:ref?.reference?`<p class="cm-transit">區域參考站：${esc(ref.name)}站<br>最近車站／出口與實際步行路線，請由 NAVER 導航確認。</p>`:''}<dl><dt>地址</dt><dd>${esc(p.address)}</dd><dt>營業</dt><dd>${esc(p.hours)}</dd>${isFood(p)?`<dt>NAVER</dt><dd>${esc(rating(p))}</dd><dt>預約</dt><dd>${esc(p.booking)}</dd>`:''}</dl>${p.note?`<p class="fm-small">${esc(p.note)}</p>`:''}<div class="fm-links"><a href="${esc(naver(p))}" target="_blank" rel="noopener noreferrer">NAVER 導航 ↗</a></div>`;
 }
 function setArea(value){if(!areas.includes(value))return;overviewArea=value;area=value;$('#overview-scope').value=value;$('#fm-detail').hidden=true;renderOverview();}
 function selectPlace(id,scroll=true){if(!places.some(p=>p.id===id))return;selected=id;detail();if(scroll)document.getElementById('food-map').scrollIntoView({behavior:'smooth',block:'nearest'});}
