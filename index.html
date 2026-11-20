@@ -186,7 +186,7 @@ function routeForDay(i){
  const anchors={'Skyline Luge':'luge','釜山樂天世界':'lotteworld','海岸列車':'beachtrain','Busan X the Sky':'xsky','Spa Land 新世界百貨公司':'spaland','白淺灘文化村':'huinnyeoul','松島纜車':'songdocable','松島龍宮雲橋':'songdobridge','Arte Museum':'arte','光復路':'gwangbok','釜山塔':'busantower','甘川文化村':'gamcheon','札嘎其市場':'jagalchi'};
  const result=[];const add=(id,title,time='')=>{const p=findPlace(id);if(p&&result.at(-1)?.id!==id)result.push({id,p,title:title||p.name,time});};
  if(i===1||i===2)add('hotel','Felix by STX（出發）');if(i>=3)add('nampo-hotel','南浦洞住宿（出發）');
- days[i].items.forEach((item,j)=>{let id=anchors[item[1]];if(i===0)id=j===1?'airport':j===2?'hotel':null;if(i===1)id=({1:'haeundae',2:'market',3:'gwangalli',5:'hotel',6:'light'})[j];if(/Felix.*check out|Check out.*Felix|寄放行李|拿行李/.test(item[1]))id='hotel';if(/南浦洞.*住宿|南浦洞 check out/.test(item[1]))id='nampo-hotel';if(i===4&&item[1]==='南浦洞')id='gwangbok';if(i===5&&/自 PUS/.test(item[1]))id='airport';if(id)add(id,item[1],item[0]);});
+ days[i].items.forEach((item,j)=>{let id=anchors[item[1]];if(i===0)id=j===1?'airport':j===2?'hotel':null;if(i===1)id=({1:'haeundae',2:'market',3:'gwangalli',5:'hotel',6:'light'})[j];if(/Felix.*check out|Check out.*Felix|寄放行李|拿行李/.test(item[1]))id='hotel';if(/南浦洞.*住宿|南浦洞 check out/.test(item[1]))id='nampo-hotel';if(i===5&&/自 PUS/.test(item[1]))id='airport';if(id)add(id,item[1],item[0]);});
  if(i===1)add('hotel','Felix by STX（返回）');if(i===3||i===4)add('nampo-hotel','南浦洞住宿（返回）');return result;
 }
 const mainIds=new Set([0,1,2,3,4,5].flatMap(i=>routeForDay(i).map(s=>s.id)));
@@ -251,6 +251,7 @@ restaurantLists();
  renderOverview();
 })();
 </script></body></html>
+
 
 
 
